@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: fastapi-app
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: fastapi
+
+  template:
+    metadata:
+      labels:
+        app: fastapi
+
+    spec:
+    
+      initContainers:
+
+      - name: wait-for-postgres
+
+        image: busybox
+
+        command:
+        - sh
+        - -c
+        - |
+          until nc -z postgres-service 5432;
+          do
+            echo "Waiting for PostgreSQL...";
+            sleep 2;
+          done;
+
+
+      containers:
+
+      - name: fastapi
+
+        image: fastapi-app:latest
+        imagePullPolicy: Never
+
+        ports:
+        - containerPort: 8000
+
+        env:
+
+        - name: DATABASE_URL
+          value: postgresql://postgres:root@postgres-service:5432/postgres
+
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secret
+              key: SECRET_KEY
