@@ -2,54 +2,50 @@ pipeline {
 
     agent any
 
-    stages {
-
-        stage('Verify Environment') {
-            steps {
-
-                sh 'pwd'
-                sh 'ls -la'
-
-                sh 'docker --version'
-                sh 'docker compose version'
-            }
-        }
-
-        stage('Stop Existing Containers') {
-            steps {
-                sh 'docker compose down || true'
-            }
-        }
-
-        stage('Build Containers') {
-            steps {
-                sh 'docker compose build'
-            }
-        }
-
-        stage('Start Containers') {
-            steps {
-                sh 'docker compose up -d'
-            }
-        }
-
-        stage('Verify Running Containers') {
-            steps {
-                sh 'docker ps'
-            }
-        }
-
+    environment {
+        IMAGE_NAME = "localhost:5000/fastapi-app"
+        IMAGE_TAG  = "${BUILD_NUMBER}"
     }
 
-    post {
+    stages {
 
-        success {
-            echo 'deployment successful'
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
         }
 
-        failure {
-            echo 'deployment failed'
+        stage('Build') {
+            steps {
+                sh """
+                docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                """
+            }
         }
 
+        stage('Push') {
+            steps {
+                sh """
+                docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                """
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh """
+                kubectl set image deployment/fastapi \
+                fastapi=${IMAGE_NAME}:${IMAGE_TAG}
+                """
+            }
+        }
+
+        stage('Rollout Status') {
+            steps {
+                sh """
+                kubectl rollout status deployment/fastapi
+                """
+            }
+        }
     }
 }

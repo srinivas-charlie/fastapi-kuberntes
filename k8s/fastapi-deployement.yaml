@@ -5,7 +5,7 @@ metadata:
   name: fastapi-app
 
 spec:
-  replicas: 1
+  replicas: 2
 
   selector:
     matchLabels:
@@ -39,8 +39,8 @@ spec:
 
       - name: fastapi
 
-        image: fastapi-app:latest
-        imagePullPolicy: Never
+        image: localhost:5000/fastapi-app:v1
+        
 
         ports:
         - containerPort: 8000
