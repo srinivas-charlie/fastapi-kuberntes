@@ -4,7 +4,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "localhost:5000/fastapi-app"
-        IMAGE_TAG  = "${BUILD_NUMBER}"
+       
     }
 
     stages {
@@ -15,27 +15,27 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build DOCKER image') {
             steps {
                 sh """
-                docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .
                 """
             }
         }
 
-        stage('Push') {
+        stage('Push TO local Registry') {
             steps {
                 sh """
-                docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                docker push ${IMAGE_NAME}:${BUILD_NUMBER}
                 """
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to KUBERNETES') {
             steps {
                 sh """
                 kubectl set image deployment/fastapi \
-                fastapi=${IMAGE_NAME}:${IMAGE_TAG}
+                fastapi=${IMAGE_NAME}:${BUILD_NUMBER}
                 """
             }
         }
@@ -47,5 +47,14 @@ pipeline {
                 """
             }
         }
+        post {
+        success {
+            echo 'Deployment Successful'
+        }
+
+        failure {
+            echo 'Deployment Failed'
+        }
+
     }
 }
