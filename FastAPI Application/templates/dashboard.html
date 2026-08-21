@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Admin Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #0b0b0c;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .f1-bg {
+            background-image: url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1974&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .glass {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateX(4px);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            transition: 0.3s ease;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body class="text-white h-screen w-screen flex">
+
+    <!-- SIDEBAR -->
+    <aside class="w-72 glass flex flex-col justify-between p-6 border-r border-gray-800">
+
+        <div>
+
+            <!-- LOGO -->
+            <div class="mb-10">
+                <h1 class="text-3xl font-bold text-red-500 tracking-wide">
+                    F1 PANEL
+                </h1>
+
+                <p class="text-gray-400 text-sm mt-2">
+                    Infrastructure Control Dashboard
+                </p>
+            </div>
+
+
+            <!-- PROFILE -->
+            <div class="glass rounded-2xl p-4 mb-8">
+
+                <div class="flex items-center gap-4">
+
+                    {% if profile_photo %}
+
+                    <img
+                        src="data:image/png;base64,{{ profile_photo }}"
+                        class="w-14 h-14 rounded-full border-2 border-red-500 object-cover"
+                    >
+
+                    {% else %}
+
+                    <div class="w-14 h-14 rounded-full border-2 border-red-500 bg-zinc-700 flex items-center justify-center text-xl font-bold">
+                        {{ user.name[0].upper() }}
+                    </div>
+
+                    {% endif %}
+
+
+                    <div>
+
+                        {% if role == "admin" %}
+
+                        <h2 class="font-semibold text-lg text-red-400">
+                            Welcome Admin
+                        </h2>
+
+                        {% else %}
+
+                        <h2 class="font-semibold text-lg">
+                            Welcome {{ user.name }}
+                        </h2>
+
+                        {% endif %}
+
+                        <p class="text-sm text-gray-400">
+                            {{ user.email }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- MENU -->
+            <nav class="space-y-3">
+
+                <a href="/dashboard"
+                   class="sidebar-link flex items-center gap-3 p-4 rounded-xl transition duration-300 glass">
+                    🏠 Dashboard
+                </a>
+
+
+                {% if role == "admin" %}
+
+                <a href="/register"
+                   class="sidebar-link flex items-center gap-3 p-4 rounded-xl transition duration-300 glass">
+                    👤 Register User
+                </a>
+
+
+                <a href="/users"
+                   class="sidebar-link flex items-center gap-3 p-4 rounded-xl transition duration-300 glass">
+                    📋 Users List
+                </a>
+
+
+                <a href="/roles"
+                   class="sidebar-link flex items-center gap-3 p-4 rounded-xl transition duration-300 glass">
+                    🔐 User Roles
+                </a>
+
+                {% endif %}
+
+
+                <a href="/profile"
+                   class="sidebar-link flex items-center gap-3 p-4 rounded-xl transition duration-300 glass">
+                    ⚙️ Profile Settings
+                </a>
+
+            </nav>
+
+        </div>
+
+
+        <!-- LOGOUT -->
+        <div>
+
+            <a href="/logout"
+               class="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 p-4 rounded-xl font-semibold transition duration-300">
+
+                🚪 Logout
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 overflow-y-auto relative">
+
+
+        <!-- HERO SECTION -->
+        <section class="f1-bg h-72 relative">
+
+            <div class="absolute inset-0 bg-black/60"></div>
+
+            <div class="relative z-10 p-10 h-full flex flex-col justify-center">
+
+                <h1 class="text-5xl font-bold mb-4 tracking-wide">
+                    F1 Command Center
+                </h1>
+
+                <p class="text-gray-300 text-lg max-w-2xl">
+                    Manage users, permissions, profiles, infrastructure access,
+                    and application controls from one unified dashboard.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- DASHBOARD CARDS -->
+        <section class="p-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+            <div class="glass rounded-3xl p-6 card-hover">
+
+                <div class="text-gray-400 text-sm mb-3">
+                    Total Users
+                </div>
+
+                <div class="text-4xl font-bold text-white">
+                    15
+                </div>
+
+                <div class="mt-4 text-green-400 text-sm">
+                    +3 this week
+                </div>
+
+            </div>
+
+
+
+            <div class="glass rounded-3xl p-6 card-hover">
+
+                <div class="text-gray-400 text-sm mb-3">
+                    Active Admins
+                </div>
+
+                <div class="text-4xl font-bold text-white">
+                    2
+                </div>
+
+                <div class="mt-4 text-blue-400 text-sm">
+                    Stable access
+                </div>
+
+            </div>
+
+
+
+            <div class="glass rounded-3xl p-6 card-hover">
+
+                <div class="text-gray-400 text-sm mb-3">
+                    Active Sessions
+                </div>
+
+                <div class="text-4xl font-bold text-white">
+                    7
+                </div>
+
+                <div class="mt-4 text-yellow-400 text-sm">
+                    Monitoring live
+                </div>
+
+            </div>
+
+
+
+            <div class="glass rounded-3xl p-6 card-hover">
+
+                <div class="text-gray-400 text-sm mb-3">
+                    Server Health
+                </div>
+
+                <div class="text-4xl font-bold text-green-400">
+                    99%
+                </div>
+
+                <div class="mt-4 text-green-400 text-sm">
+                    All systems operational
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- QUICK ACTIONS -->
+        <section class="px-10 pb-10">
+
+            <div class="glass rounded-3xl p-8">
+
+                <div class="flex justify-between items-center mb-8">
+
+                    <h2 class="text-2xl font-semibold">
+                        Quick Actions
+                    </h2>
+
+                    <span class="text-gray-400 text-sm">
+                        Control Center
+                    </span>
+
+                </div>
+
+
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+
+                    {% if role == "admin" %}
+
+                    <a href="/register"
+                       class="glass rounded-2xl p-6 hover:border-red-500 transition duration-300 border border-transparent">
+
+                        <div class="text-4xl mb-4">
+                            👤
+                        </div>
+
+                        <h3 class="text-xl font-semibold mb-2">
+                            Register User
+                        </h3>
+
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Create and onboard new platform users.
+                        </p>
+
+                    </a>
+
+
+
+                    <a href="/users"
+                       class="glass rounded-2xl p-6 hover:border-red-500 transition duration-300 border border-transparent">
+
+                        <div class="text-4xl mb-4">
+                            📋
+                        </div>
+
+                        <h3 class="text-xl font-semibold mb-2">
+                            Users List
+                        </h3>
+
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            View and manage all registered users.
+                        </p>
+
+                    </a>
+
+
+
+                    <a href="/roles"
+                       class="glass rounded-2xl p-6 hover:border-red-500 transition duration-300 border border-transparent">
+
+                        <div class="text-4xl mb-4">
+                            🔐
+                        </div>
+
+                        <h3 class="text-xl font-semibold mb-2">
+                            Change Roles
+                        </h3>
+
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Promote users to admin or modify permissions.
+                        </p>
+
+                    </a>
+
+                    {% endif %}
+
+
+
+                    <a href="/profile"
+                       class="glass rounded-2xl p-6 hover:border-red-500 transition duration-300 border border-transparent">
+
+                        <div class="text-4xl mb-4">
+                            ⚙️
+                        </div>
+
+                        <h3 class="text-xl font-semibold mb-2">
+                            Profile Settings
+                        </h3>
+
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Update profile photo and personal information.
+                        </p>
+
+                    </a>
+
+
+
+                    <div class="glass rounded-2xl p-6 border border-dashed border-gray-600">
+
+                        <div class="text-4xl mb-4">
+                            🏎️
+                        </div>
+
+                        <h3 class="text-xl font-semibold mb-2">
+                            F1 Telemetry
+                        </h3>
+
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Future module for analytics and monitoring.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>
