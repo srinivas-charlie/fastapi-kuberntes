@@ -15,13 +15,12 @@ RUN python3 -m venv /app/venv
 
 ENV PATH="/app/venv/bin:$PATH"
 
-COPY requirements.txt .
+COPY Containerization/requirements.txt .
 
-RUN pip install --upgrade pip
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-RUN pip install -r requirements.txt
-
-COPY . .
+COPY "FastAPI Application/" .
 
 EXPOSE 8000
 
