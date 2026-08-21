@@ -15,7 +15,7 @@ RUN python3 -m venv /app/venv
 
 ENV PATH="/app/venv/bin:$PATH"
 
-COPY Containerization/requirements.txt .
+COPY requirements.txt .
 
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
@@ -24,4 +24,4 @@ COPY fastapiapp/ .
 
 EXPOSE 8000
 
-CMD ["uvicorn", "fastapiapp.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
