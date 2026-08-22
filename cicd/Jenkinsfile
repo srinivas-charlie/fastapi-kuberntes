@@ -34,17 +34,33 @@ pipeline {
             }
         }
 
-        stage('Deploy To Kubernetes') {
-            steps {
-                sh """
-                kubectl set image deployment/fastapi-app \
-                fastapi=${IMAGE_NAME}:${BUILD_NUMBER}
+    //     stage('Deploy To Kubernetes') {
+    //         steps {
+    //             sh """
+    //             kubectl set image deployment/fastapi-app \
+    //             fastapi=${IMAGE_NAME}:${BUILD_NUMBER}
 
-                kubectl rollout status deployment/fastapi-app
-                """
-            }
-        }
-    }
+    //             kubectl rollout status deployment/fastapi-app
+    //             """
+    //         }
+    //     }
+    // }
+
+            stage('Deploy To Kubernetes') { 
+        steps { 
+             sh """ 
+            # Create or update Kubernetes resources
+         kubectl apply -f ./k8s/
+
+            # Update the deployment with the current build image
+            kubectl set image deployment/fastapi-app \
+            fastapi=${IMAGE_NAME}:${BUILD_NUMBER}
+
+            # Wait until deployment is successful
+            kubectl rollout status deployment/fastapi-app
+        """ 
+    } 
+}
 
     post {
         success {
