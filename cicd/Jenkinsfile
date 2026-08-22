@@ -18,9 +18,9 @@ pipeline {
             steps {
                 dir('Containerization') {
                     sh """
-                    docker build \
-                    -t ${IMAGE_NAME}:${BUILD_NUMBER} \
-                    .
+                        docker build \
+                        -t ${IMAGE_NAME}:${BUILD_NUMBER} \
+                        .
                     """
                 }
             }
@@ -29,38 +29,27 @@ pipeline {
         stage('Push To Local Registry') {
             steps {
                 sh """
-                docker push ${IMAGE_NAME}:${BUILD_NUMBER}
+                    docker push ${IMAGE_NAME}:${BUILD_NUMBER}
                 """
             }
         }
 
-    //     stage('Deploy To Kubernetes') {
-    //         steps {
-    //             sh """
-    //             kubectl set image deployment/fastapi-app \
-    //             fastapi=${IMAGE_NAME}:${BUILD_NUMBER}
+        stage('Deploy To Kubernetes') {
+            steps {
+                sh """
+                    # Create or update Kubernetes resources
+                    kubectl apply -f ./k8s/
 
-    //             kubectl rollout status deployment/fastapi-app
-    //             """
-    //         }
-    //     }
-    // }
+                    # Update image with current build number
+                    kubectl set image deployment/fastapi-app \
+                    fastapi=${IMAGE_NAME}:${BUILD_NUMBER}
 
-            stage('Deploy To Kubernetes') { 
-        steps { 
-             sh """ 
-            # Create or update Kubernetes resources
-         kubectl apply -f ./k8s/
-
-            # Update the deployment with the current build image
-            kubectl set image deployment/fastapi-app \
-            fastapi=${IMAGE_NAME}:${BUILD_NUMBER}
-
-            # Wait until deployment is successful
-            kubectl rollout status deployment/fastapi-app
-        """ 
-    } 
-}
+                    # Wait for rollout
+                    kubectl rollout status deployment/fastapi-app
+                """
+            }
+        }
+    }
 
     post {
         success {
