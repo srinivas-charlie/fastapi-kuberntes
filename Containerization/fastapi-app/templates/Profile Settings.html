@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings - F1 Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #0b0b0c;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .glass {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .f1-bg {
+            background-image: url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1974&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+
+        input, textarea {
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: white;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239,68,68,0.15);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #6b7280;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateX(4px);
+        }
+    </style>
+</head>
+
+<body class="text-white min-h-screen">
+
+    <div class="min-h-screen flex">
+
+        <!-- SIDEBAR -->
+        <aside class="w-72 glass flex flex-col justify-between p-6 border-r border-gray-800 fixed inset-y-0 left-0">
+
+            <div>
+                <div class="mb-10">
+                    <a href="/dashboard" class="text-3xl font-bold text-red-500 tracking-wide">
+                        F1 PANEL
+                    </a>
+                    <p class="text-gray-400 text-sm mt-2">
+                        Infrastructure Control Dashboard
+                    </p>
+                </div>
+
+                <!-- CURRENT USER -->
+                <div class="glass rounded-2xl p-4 mb-8">
+                    <div class="flex items-center gap-4">
+                        {% if profile_photo %}
+                        <img
+                            src="data:image/png;base64,{{ profile_photo }}"
+                            class="w-14 h-14 rounded-full border-2 border-red-500 object-cover"
+                            alt="Profile"
+                        >
+                        {% else %}
+                        <div class="w-14 h-14 rounded-full border-2 border-red-500 bg-zinc-700 flex items-center justify-center text-xl font-bold">
+                            {{ user.name[0].upper() }}
+                        </div>
+                        {% endif %}
+
+                        <div class="min-w-0">
+                            <h2 class="font-semibold text-lg text-red-400 truncate">
+                                {{ user.name }}
+                            </h2>
+                            <p class="text-sm text-gray-400 truncate">
+                                {{ user.email }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <nav class="space-y-3">
+                    <a href="/dashboard"
+                       class="sidebar-link flex items-center gap-3 p-4 rounded-xl transition duration-300 glass">
+                        🏠 Dashboard
+                    </a>
+
+                    {% if role == "admin" %}
+                    <a href="/register"
+                       class="sidebar-link flex items-center gap-3 p-4 rounded-xl transition duration-300 glass">
+                        👤 Register User
+                    </a>
+
+                    <a href="/users"
+                       class="sidebar-link flex items-center gap-3 p-4 rounded-xl transition duration-300 glass">
+                        📋 Users List
+                    </a>
+
+                    <a href="/roles"
+                       class="sidebar-link flex items-center gap-3 p-4 rounded-xl transition duration-300 glass">
+                        🔐 User Roles
+                    </a>
+                    {% endif %}
+
+                    <a href="/profile"
+                       class="sidebar-link flex items-center gap-3 p-4 rounded-xl transition duration-300 bg-red-600/20 border border-red-500/40">
+                        ⚙️ Profile Settings
+                    </a>
+                </nav>
+            </div>
+
+            <a href="/logout"
+               class="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 p-4 rounded-xl font-semibold transition">
+                🚪 Logout
+            </a>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="ml-72 flex-1 min-h-screen">
+
+            <!-- HEADER -->
+            <header class="h-20 border-b border-gray-800 glass flex items-center justify-between px-10 sticky top-0 z-20">
+                <div>
+                    <p class="text-gray-400 text-sm">Account</p>
+                    <h1 class="text-2xl font-bold">Profile Settings</h1>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    {% if profile_photo %}
+                    <img
+                        src="data:image/png;base64,{{ profile_photo }}"
+                        class="w-10 h-10 rounded-full border-2 border-red-500 object-cover"
+                        alt="Profile"
+                    >
+                    {% else %}
+                    <div class="w-10 h-10 rounded-full border-2 border-red-500 bg-zinc-700 flex items-center justify-center font-bold">
+                        {{ user.name[0].upper() }}
+                    </div>
+                    {% endif %}
+                    <span class="font-semibold">{{ user.name }}</span>
+                </div>
+            </header>
+
+            <div class="p-10">
+
+                <!-- HERO -->
+                <section class="f1-bg rounded-3xl overflow-hidden relative mb-8">
+                    <div class="absolute inset-0 bg-black/70"></div>
+                    <div class="relative z-10 p-8">
+                        <p class="text-red-400 font-semibold uppercase tracking-widest text-sm mb-2">
+                            Account Control
+                        </p>
+                        <h2 class="text-4xl font-bold mb-2">Personal Profile</h2>
+                        <p class="text-gray-300 max-w-2xl">
+                            Update your personal information and profile picture.
+                        </p>
+                    </div>
+                </section>
+
+                {% if message %}
+                <div class="mb-6 rounded-xl border border-green-500/40 bg-green-500/10 text-green-300 px-5 py-4">
+                    {{ message }}
+                </div>
+                {% endif %}
+
+                {% if error %}
+                <div class="mb-6 rounded-xl border border-red-500/40 bg-red-500/10 text-red-300 px-5 py-4">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <!-- PROFILE + PERSONAL INFO -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+
+                    <!-- PHOTO -->
+                    <section class="glass rounded-3xl p-8">
+                        <h2 class="text-xl font-semibold mb-6">Profile Picture</h2>
+
+                        <div class="flex justify-center mb-7">
+                            {% if profile_photo %}
+                            <img
+                                id="profilePreview"
+                                src="data:image/png;base64,{{ profile_photo }}"
+                                class="w-52 h-52 rounded-full border-4 border-red-500 object-cover"
+                                alt="Profile Picture"
+                            >
+                            {% else %}
+                            <div
+                                id="profileFallback"
+                                class="w-52 h-52 rounded-full border-4 border-red-500 bg-zinc-800 flex items-center justify-center text-6xl font-bold text-red-400">
+                                {{ user.name[0].upper() }}
+                            </div>
+                            <img
+                                id="profilePreview"
+                                class="hidden w-52 h-52 rounded-full border-4 border-red-500 object-cover"
+                                alt="Profile Picture"
+                            >
+                            {% endif %}
+                        </div>
+
+                        <form action="/profile/photo" method="post" enctype="multipart/form-data">
+                            <label
+                                for="photoInput"
+                                class="block text-center cursor-pointer bg-red-600 hover:bg-red-700 rounded-xl py-3 px-4 font-semibold transition">
+                                📷 Choose New Photo
+                            </label>
+
+                            <input
+                                id="photoInput"
+                                name="profile_photo"
+                                type="file"
+                                accept="image/jpeg,image/png,image/gif"
+                                class="hidden"
+                                required
+                            >
+
+                            <button
+                                type="submit"
+                                class="w-full mt-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl py-3 font-semibold transition">
+                                Upload Photo
+                            </button>
+                        </form>
+
+                        <form action="/profile/photo/remove" method="post"
+                              onsubmit="return confirm('Remove your profile photo?');">
+                            <button
+                                type="submit"
+                                class="w-full mt-3 border border-red-500/40 text-red-400 hover:bg-red-500/10 rounded-xl py-3 font-semibold transition">
+                                🗑 Remove Photo
+                            </button>
+                        </form>
+
+                        <p class="text-gray-500 text-xs text-center mt-5">
+                            JPG, PNG or GIF. Maximum size: 2MB.
+                        </p>
+                    </section>
+
+                    <!-- PERSONAL INFORMATION -->
+                    <section class="glass rounded-3xl p-8 xl:col-span-2">
+                        <h2 class="text-xl font-semibold mb-7">Personal Information</h2>
+
+                        <form action="/profile/update" method="post">
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-300 mb-2">
+                                    Full Name
+                                </label>
+                                <input
+                                    name="name"
+                                    type="text"
+                                    value="{{ user.name }}"
+                                    required
+                                    class="w-full rounded-xl px-4 py-3"
+                                >
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-300 mb-2">
+                                    Email
+                                </label>
+                                <input
+                                    name="email"
+                                    type="email"
+                                    value="{{ user.email }}"
+                                    required
+                                    class="w-full rounded-xl px-4 py-3"
+                                >
+                            </div>
+
+                            <div class="rounded-2xl bg-black/20 border border-white/5 p-5 mb-7">
+                                <p class="text-sm text-gray-400">
+                                    Your username is your registered email address in the current
+                                    database model. Changing the email also updates your login email.
+                                </p>
+                            </div>
+
+                            <div class="flex justify-end gap-3">
+                                <a
+                                    href="/dashboard"
+                                    class="px-6 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 font-semibold transition">
+                                    Cancel
+                                </a>
+
+                                <button
+                                    type="submit"
+                                    class="px-7 py-3 rounded-xl bg-red-600 hover:bg-red-700 font-semibold transition">
+                                    💾 Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+
+                <!-- ACCOUNT INFORMATION -->
+                <section class="glass rounded-3xl p-8 mt-8">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+
+                        <div>
+                            <h2 class="text-xl font-semibold mb-6">Account Information</h2>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-4 text-sm">
+                                <div>
+                                    <span class="text-gray-500">Name</span>
+                                    <p class="font-medium mt-1">{{ user.name }}</p>
+                                </div>
+
+                                <div>
+                                    <span class="text-gray-500">Email</span>
+                                    <p class="font-medium mt-1">{{ user.email }}</p>
+                                </div>
+
+                                <div>
+                                    <span class="text-gray-500">Role</span>
+                                    <p class="font-medium mt-1 text-red-400 uppercase">{{ user.role }}</p>
+                                </div>
+
+                                <div>
+                                    <span class="text-gray-500">Profile Photo</span>
+                                    <p class="font-medium mt-1">
+                                        {% if profile_photo %}
+                                            Uploaded
+                                        {% else %}
+                                            Not uploaded
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rounded-2xl border border-red-500/30 bg-red-500/10 px-6 py-5">
+                            <p class="text-red-400 text-sm font-semibold">Account Role</p>
+                            <p class="text-2xl font-bold mt-1 uppercase">{{ user.role }}</p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const photoInput = document.getElementById("photoInput");
+
+        if (photoInput) {
+            photoInput.addEventListener("change", function () {
+                const file = this.files[0];
+
+                if (!file) return;
+
+                if (file.size > 2 * 1024 * 1024) {
+                    alert("Profile photo must be smaller than 2MB.");
+                    this.value = "";
+                    return;
+                }
+
+                const allowed = ["image/jpeg", "image/png", "image/gif"];
+
+                if (!allowed.includes(file.type)) {
+                    alert("Please select a JPG, PNG or GIF image.");
+                    this.value = "";
+                    return;
+                }
+
+                const reader = new FileReader();
+
+                reader.onload = function (event) {
+                    const preview = document.getElementById("profilePreview");
+                    const fallback = document.getElementById("profileFallback");
+
+                    preview.src = event.target.result;
+                    preview.classList.remove("hidden");
+
+                    if (fallback) {
+                        fallback.classList.add("hidden");
+                    }
+                };
+
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+</body>
+</html>
