@@ -1,26 +1,17 @@
 FROM python:3.12-slim
 
-# Prevent python buffering
 ENV PYTHONUNBUFFERED=1
-
 WORKDIR /app
 
-RUN apt update && apt install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
-    && apt clean
-
-RUN python3 -m venv /app/venv
+RUN python -m venv /app/venv
 
 ENV PATH="/app/venv/bin:$PATH"
 
-COPY requirements.txt .
+COPY requirements.txt /app/requirements.txt
 
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+RUN /app/venv/bin/python -m pip install --no-cache-dir --upgrade pip && /app/venv/bin/python -m pip install --no-cache-dir -r /app/requirements.txt && /app/venv/bin/python -m pip show psycopg
 
-COPY fastapi-app/ .
+COPY fastapi-app/ /app/
 
 EXPOSE 8000
 

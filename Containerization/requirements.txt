@@ -3,6 +3,6 @@ uvicorn
 jinja2
 python-multipart
 sqlalchemy
-psycopg2-binary
+psycopg[binary]
 itsdangerous
 email-validator
